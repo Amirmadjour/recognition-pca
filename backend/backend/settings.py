@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-j5*y-^*p##^&($4pqo@o5r2r*h3)umy#3+p+k^ul%usha04@!0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.35']
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:19006',  # Expo URL for local development
+    'http://192.168.1.35:8000',  # Your Expo app IP address
+]
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -37,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -48,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
