@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Platform } from "react-native";
+import { View } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -9,6 +10,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Text } from "react-native";
 import Constants from 'expo-constants';
+
+import '../../globals.css'
 
 export default function HomeScreen() {
   const [message, setMessage] = useState("");
@@ -53,10 +56,10 @@ export default function HomeScreen() {
     >
       <ThemedView style={styles.titleContainer}>
         <ScrambleText />
-        <Text>{message}</Text>
+        <Text className="bg-slate-600 rounded-xl">{message}</Text>
         <HelloWave />
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+      <View style={styles.stepContainer} className="bg-blue-400">
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
           Edit{" "}
@@ -71,7 +74,7 @@ export default function HomeScreen() {
           </ThemedText>{" "}
           to open developer tools.
         </ThemedText>
-      </ThemedView>
+      </View>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 2: Explore</ThemedText>
         <ThemedText>
