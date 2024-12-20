@@ -83,8 +83,6 @@ __MACOSX/
 *.lock
 .cache/
 
-# Metro bundler
-metro.config.js
 # Temporary React Native files
 .expo/*
 *.temp
