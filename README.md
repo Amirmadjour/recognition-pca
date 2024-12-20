@@ -69,10 +69,10 @@ npm i
 
 - Android
 ```bash
-expo build -p android
+eas build -p android
 ```
 
 - Ios
 ```bash
-expo build -p ios
+eas build -p ios
 ```
