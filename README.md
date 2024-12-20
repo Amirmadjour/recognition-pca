@@ -7,14 +7,15 @@
    ```bash
    npm install
    ```
+2. run all the cells in pca.ipynb file to generate models files( do this only once, if you don't have the pkl files in backend)
 
-2. Start the app
+3. Start the app
 
    ```bash
     npx expo start
    ```
 
-3. Start the django server
+4. Start the django server
 
    ```bash
    python manage.py runserver 0.0.0.0:8000
@@ -62,7 +63,6 @@ npm i
 ```
 
 # Work with local backend:
-- run all the cells in pca.ipynb file to generate models files
 - if you are working with windows and android, make sure to include your pc address into ALLOWED_HOSTS and CORS_ALLOWED_ORIGINS in backend/backend/settings.py
 
 # Build command:
