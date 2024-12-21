@@ -76,3 +76,28 @@ eas build -p android
 ```bash
 eas build -p ios
 ```
+
+# Build local for android:
+
+1. generate .android/ 
+
+```bash
+expo prebuild
+```
+
+2. installed required packages and verify by running 
+```bash
+npx react-native doctor
+```
+
+the packages are:
+- jdk version 17 or 20
+- android studio
+- android sdk
+- make sure to use an emulator or enable usb debbugging for a physical device
+
+3. build the app:
+
+```bash
+npx react-native build-android --mode=release
+```
