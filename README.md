@@ -2,22 +2,30 @@
 
 ## Get started
 
-1. Install dependencies
+1. Install dependencies and python libraries
 
    ```bash
+   cd facial-recongnition
    npm install
    ```
-2. run all the cells in pca.ipynb file to generate models files( do this only once, if you don't have the pkl files in backend)
+
+   ```bash
+   cd backend 
+   pip install -r requirements.txt
+   ```
+2. run all the cells in ipynb files to generate model files( do this only once, if you don't have the pkl, keras, npz files in backend)
 
 3. Start the app
 
    ```bash
-    npx expo start
+   cd facial-recognition
+   npx expo start
    ```
 
 4. Start the django server
 
    ```bash
+   cd backend
    python manage.py runserver 0.0.0.0:8000
    ```
 

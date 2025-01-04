@@ -118,7 +118,7 @@ def cnn_pca_digits(request):
 
         image_array = np.array(image)
 
-        def plot_images(original ):
+        def plot_images(original):
             plt.figure(figsize=(10, 4))
             # Original
             plt.imshow(original.reshape(28, 28), cmap='gray')
@@ -144,7 +144,7 @@ def cnn_pca_digits(request):
         
         image_reconstructed = reconstruct(image_reduced, loaded['principal_components'])
         print(image_reconstructed.shape)
-        plot_images(image_reconstructed)
+        #plot_images(image_reconstructed)
 
         predicted_label = np.argmax(loaded_model.predict(image_reconstructed.reshape(1, 28, 28, 1)))
 
