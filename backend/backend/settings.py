@@ -25,10 +25,10 @@ SECRET_KEY = 'django-insecure-j5*y-^*p##^&($4pqo@o5r2r*h3)umy#3+p+k^ul%usha04@!0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '192.168.1.40', 'handwrittendigits.madjria.com']
+ALLOWED_HOSTS = ['localhost', '192.168.1.37', 'handwrittendigits.madjria.com']
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',  # Expo URL for local development
-    'http://192.168.1.40:8000',  # Your Expo app IP address
+    'http://192.168.1.37:8000',  # Your Expo app IP address
     'https://handwrittendigits.madjria.com'
 ]
 # CORS_ALLOW_ALL_ORIGINS = True

@@ -12,6 +12,8 @@ import os
 from PIL import Image
 from io import BytesIO
 import base64
+import tensorflow as tf
+import matplotlib.pyplot as plt
 
 class HelloWorldView(APIView):
     def get(self, request):
@@ -74,3 +76,78 @@ def pca_digits(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['POST'])
+def cnn_digits(request):
+    try:
+        base64_image = request.data.get('image')
+
+
+        image_data = base64.b64decode(base64_image)  # Remove the data URL part
+        image = Image.open(BytesIO(image_data))
+
+        loaded_model = tf.keras.models.load_model('mnist_cnn_model.keras')
+
+        # Resize the image to 28x28 pixels (grayscale)
+        image = image.convert('L')  # Convert to grayscale
+        image = image.resize((28, 28))
+        image_array = np.array(image)
+
+        predicted_label = np.argmax(loaded_model.predict(image_array.reshape(1, 28, 28, 1)))
+
+        return Response({"message": f"{predicted_label}"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def cnn_pca_digits(request):
+    try:
+        base64_image = request.data.get('image')
+
+
+        image_data = base64.b64decode(base64_image)  # Remove the data URL part
+        image = Image.open(BytesIO(image_data))
+
+        loaded_model = tf.keras.models.load_model('mnist_cnn_pca_model.keras')
+
+        # Resize the image to 28x28 pixels (grayscale)
+        image = image.convert('L')  # Convert to grayscale
+        image = image.resize((28, 28))
+
+
+        image_array = np.array(image)
+
+        def plot_images(original ):
+            plt.figure(figsize=(10, 4))
+            # Original
+            plt.imshow(original.reshape(28, 28), cmap='gray')
+            plt.title("CNN with pca")
+            plt.axis('off')
+
+            plt.tight_layout()
+            plt.show()
+
+
+        image_array = image_array.reshape(-1, 784)
+
+        loaded = np.load("arrays.npz")
+        Z = (image_array - loaded['X_mean']) / loaded['X_std']
+        image_reduced = np.real(np.dot(Z, loaded['principal_components']))
+
+        def reconstruct(X, principal_components):
+          X_reconstructed = 0
+          for i in range(principal_components.shape[1]):
+            X_reconstructed += X[:, i].reshape(-1, 1).dot(principal_components[:, i].reshape(-1, 1).T)
+
+          return X_reconstructed
+        
+        image_reconstructed = reconstruct(image_reduced, loaded['principal_components'])
+        print(image_reconstructed.shape)
+        plot_images(image_reconstructed)
+
+        predicted_label = np.argmax(loaded_model.predict(image_reconstructed.reshape(1, 28, 28, 1)))
+
+        return Response({"message": f"{predicted_label}"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

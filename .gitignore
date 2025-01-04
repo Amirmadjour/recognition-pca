@@ -117,3 +117,5 @@ coverage/
 
 # Models
 *.pkl
+*.keras
+*.npz

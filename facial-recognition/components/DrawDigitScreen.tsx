@@ -56,7 +56,7 @@ export default () => {
       console.info("28x28 Image Base64:", base64Image);
 
       axios
-        .post("pca_digits/", { image: base64Image })
+        .post("cnn_pca_digits/", { image: base64Image })
         .then((res) => {
           setResult(res.data.message);
           console.info(res.data.message);
