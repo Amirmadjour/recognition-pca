@@ -1,111 +1,83 @@
-# recognition-pca
+# Letter Recognition App
 
-## Get started
+A mobile application that recognizes handwritten letters using different machine learning approaches (CNN and PCA+CNN).
 
-1. Install dependencies and python libraries
+## Project Structure
 
-   ```bash
-   cd facial-recongnition
-   npm install
-   ```
+- **backend/** - Django REST API server
+- **facial-recognition/** - React Native mobile application
 
-   ```bash
-   cd backend 
-   pip install -r requirements.txt
-   ```
-2. run all the cells in ipynb files to generate model files( do this only once, if you don't have the pkl, keras, npz files in backend)
+## Features
 
-3. Start the app
+- Handwritten letter recognition using:
+  - CNN model
+  - PCA + CNN model (dimensionality reduction)
+- Real-time drawing interface
+- Camera capture support
+- API endpoints for different recognition methods
 
-   ```bash
-   cd facial-recognition
-   npx expo start
-   ```
+## Getting Started
 
-4. Start the django server
+### Backend Setup
 
-   ```bash
-   cd backend
-   python manage.py runserver 0.0.0.0:8000
-   ```
-
-## Get a fresh project
-
-When you're ready, run:
-
+1. Create and activate a virtual environment:
 ```bash
-npm run reset-project
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## To fix Something went wrong
-
-- replace with your address ip (pc ip).
-
-exemple: pc address is 192.168.1.35 using the ipconfig in cmd
-
+2. Install Python dependencies:
 ```bash
-setx /M REACT_NATIVE_PACKAGER_HOSTNAME 192.168.1.35
+cd backend
+pip install -r requirements.txt
 ```
 
-# Be aware:
-
-- Do not change the tailwindcss version, the one that works is tailwindcss@3.3.2
-- Do not change the nativewind version, the one that works for this project is nativewind@2.0.11
-- if you find in package.json file 
-
-```js
-"tailwindcss": "^3.3.2",
-```
-- remove the '^', it becomes
-
-```js
-"tailwindcss": "3.3.2",
-```
-
-- then run
-
+3. Run Django server:
 ```bash
-npm i
+python manage.py runserver
 ```
 
-# Work with local backend:
-- if you are working with windows and android, make sure to include your pc address into ALLOWED_HOSTS and CORS_ALLOWED_ORIGINS in backend/backend/settings.py
+### Mobile App Setup
 
-# Build command:
-
-- Android
+1. Install dependencies:
 ```bash
-eas build -p android
+cd facial-recognition
+npm install
 ```
 
-- Ios
+2. Start the development server:
 ```bash
-eas build -p ios
+npx expo start
 ```
 
-# Build local for android:
-
-1. generate .android/ 
-
-```bash
-expo prebuild
-```
-
-2. installed required packages and verify by running 
-```bash
-npx react-native doctor
-```
-
-the packages are:
-- jdk version 17 or 20
-- android studio
-- android sdk
-- make sure to use an emulator or enable usb debbugging for a physical device
-
-3. build the app:
-
+3. Build the app:
 ```bash
 npx react-native build-android --mode=release
 ```
+
+## API Endpoints
+
+- `/api/hello/` - Test endpoint
+- `/api/pca_letters/` - Letter recognition using PCA + CNN
+- `/api/cnn_letters/` - Letter recognition using CNN only
+- `/api/cnn_pca_letters/` - Alternative PCA + CNN endpoint
+
+## Technologies Used
+
+### Backend
+- Django
+- Django REST Framework
+- TensorFlow
+- NumPy
+- Pillow
+- scikit-learn
+
+### Frontend
+- React Native
+- Expo
+- TypeScript
+- Lottie for animations
+
+## License
+
+[Your license here]
