@@ -1,33 +1,46 @@
-import React from "react";
-import { Text, TouchableOpacity, ActivityIndicator } from "react-native";
-import clsx from "clsx";
+import React, { useRef } from "react";
+import { TouchableWithoutFeedback, Animated, StyleSheet, ViewProps } from "react-native";
 
-interface ButtonProps {
-  onPress: () => void; // Function to handle button press
-  classNameStyle?: string; // Tailwind classes for the button container
-  isLoading?: boolean; // Loading state
-  disabled?: boolean; // Disabled state
-  children?: React.ReactNode; // Custom components passed to the button
+interface ButtonProps extends ViewProps {
+  children: React.ReactNode;
+  isLoading?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  onPress,
-  classNameStyle = "",
-  isLoading = false,
-  disabled = false,
-  children,
-}) => {
-  const isDisabled = isLoading || disabled;
+const Button: React.FC<ButtonProps> = ({ children, onPress, isLoading, style }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={isDisabled}
-      className={clsx("p-6 bg-white/80 rounded-full w-fit h-fit", classNameStyle)}
-    >
-      {isLoading ? <ActivityIndicator color="#1C1C1C" /> : children}
-    </TouchableOpacity>
+    <TouchableWithoutFeedback onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
+      <Animated.View style={[styles.button, style, { transform: [{ scale: scaleAnim }] }]}>
+        {children}
+      </Animated.View>
+    </TouchableWithoutFeedback>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: "#4A90E2",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 export default Button;

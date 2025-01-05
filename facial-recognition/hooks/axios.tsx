@@ -2,22 +2,47 @@ import axios from "axios";
 import Constants from "expo-constants";
 
 const baseURLsm = () => {
-  const localhost = "http://192.168.1.37:8000"; // Replace with your local IP
-  if (Constants.platform?.ios) {
-    return "http://localhost:8000/api/"; // Works for iOS
-  } else if (Constants.platform?.android) {
-    return `${localhost}/api/`; // Works for Android
-  }
-  return `${localhost}/api/`; // Default fallback
+  return 'http://192.168.1.33:8000/api';
 };
 
-const baseURL = __DEV__
-  ? baseURLsm() // Localhost for development
-  : "https://handwrittendigits.madjria.com/api"; // Hosted for production
-
-console.info("baseURL: ", baseURL);
-
-//const url = baseURL()
-export default axios.create({
-  baseURL,
+const instance = axios.create({
+  baseURL: baseURLsm(),
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  }
 });
+
+// Endpoints
+export const endpoints = {
+  hello: () => instance.get('/hello/'),
+  pcaLetters: (imageBase64: string) => instance.post('/pca_letters/', { image: imageBase64 }),
+  cnn_letters: (imageBase64: string) => instance.post('/cnn_letters/', { image: imageBase64 }),
+  cnnPcaLetters: (imageBase64: string) => instance.post('/cnn_pca_letters/', { image: imageBase64 }),
+};
+
+// Intercepteurs pour le débogage
+instance.interceptors.request.use(
+  (config) => {
+    console.log('Request:', config.url, config.data);
+    return config;
+  },
+  (error) => {
+    console.error('Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+instance.interceptors.response.use(
+  (response) => {
+    console.log('Response:', response.status, response.data);
+    return response;
+  },
+  (error) => {
+    console.error('Response Error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
+export default instance;

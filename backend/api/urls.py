@@ -1,10 +1,10 @@
 # api/urls.py
 from django.urls import path
-from .views import HelloWorldView, pca_digits, cnn_digits, cnn_pca_digits
+from .views import HelloWorldView, pca_letters, cnn_letters, cnn_pca_letters
 
 urlpatterns = [
     path('hello/', HelloWorldView.as_view()),
-    path('pca_digits/', pca_digits, name='pca_digits'),
-    path('cnn_digits/', cnn_digits, name='cnn_digits'),
-    path('cnn_pca_digits/', cnn_pca_digits, name="cnn_pca_digits")
+    path('pca_letters/', pca_letters, name='pca_letters'),
+    path('cnn_letters/', cnn_letters, name='cnn_letters'),
+    path('cnn_pca_letters/', cnn_pca_letters, name="cnn_pca_letters")
 ]

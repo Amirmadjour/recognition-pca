@@ -1,10 +1,7 @@
 from django.shortcuts import render
-
-# Create your views here.
-# api/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 import joblib
 import numpy as np
@@ -13,141 +10,158 @@ from PIL import Image
 from io import BytesIO
 import base64
 import tensorflow as tf
-import matplotlib.pyplot as plt
+from rest_framework.parsers import MultiPartParser, FormParser
+
+# Label mapping for EMNIST
+EMNIST_LABELS = {
+    0: 'A',
+    1: 'B',
+    2: 'C',
+    3: 'D',
+    4: 'E',
+    5: 'F',
+    6: 'G',
+    7: 'H',
+    8: 'I',
+    9: 'J',
+    10: 'K',
+    11: 'L',
+    12: 'M',
+    13: 'N',
+    14: 'O',
+    15: 'P',
+    16: 'Q',
+    17: 'R',
+    18: 'S',
+    19: 'T',
+    20: 'U',
+    21: 'V',
+    22: 'W',
+    23: 'X',
+    24: 'Y',
+    25: 'Z'
+}
+
+try:
+    pca_components_path = os.path.abspath("arrays_emnist.npz")
+    loaded_pca_data = np.load(pca_components_path)
+    principal_components = loaded_pca_data['principal_components']
+    X_mean = loaded_pca_data['X_mean']
+    X_std = loaded_pca_data['X_std']
+except Exception as e:
+    principal_components = None
+    X_mean = None
+    X_std = None
+    print(f"Error loading PCA components: {e}")
+
+try:
+    cnn_pca_model_path = os.path.abspath("emnist_cnn_pca_model.keras")
+    loaded_cnn_pca_model = tf.keras.models.load_model(cnn_pca_model_path)
+except Exception as e:
+    loaded_cnn_pca_model = None
+    print(f"Error loading CNN PCA model: {e}")
 
 class HelloWorldView(APIView):
     def get(self, request):
         return Response({"message": "Hello from Django!"})
 
 @api_view(['POST'])
-def pca_digits(request):
+def pca_letters(request):
     try:
-
-        pca_model_path = os.path.abspath("pca_model.pkl")
-        knn_model_path = os.path.abspath("knn_model.pkl")
-        print("PCA model path:", pca_model_path)
-        print("KNN model path:", knn_model_path)
-
-        loaded_pca = joblib.load("pca_model.pkl")
-        loaded_knn = joblib.load("knn_model.pkl")
+        if principal_components is None or loaded_cnn_pca_model is None:
+            return Response({"error": "Models not loaded properly"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         base64_image = request.data.get('image')
-
-
-        image_data = base64.b64decode(base64_image)  # Remove the data URL part
-        print(image_data)
+        if not base64_image:
+            return Response({"error": "No image data provided"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        image_data = base64.b64decode(base64_image)
         image = Image.open(BytesIO(image_data))
 
-
-        # Resize the image to 28x28 pixels (grayscale)
-        image = image.convert('L')  # Convert to grayscale
+        image = image.convert('L')
         image = image.resize((28, 28))
-
-        # Convert image to numpy array (flatten it)
         image_array = np.array(image)
+        image_flat = image_array.reshape(1, -1)
 
-        def plot_images(original ):
-            plt.figure(figsize=(10, 4))
-            # Original
-            plt.imshow(original.reshape(28, 28), cmap='gray')
-            plt.title("Original")
-            plt.axis('off')
+        Z = (image_flat - X_mean) / X_std
+        image_reduced = np.dot(Z, principal_components)
+        image_reduced_reshaped = image_reduced.reshape(1, 10, 10, 1)
 
-            plt.tight_layout()
-            plt.show()
+        prediction = loaded_cnn_pca_model.predict(image_reduced_reshaped)
+        predicted_label = np.argmax(prediction, axis=1)[0]
+        predicted_character = EMNIST_LABELS.get(predicted_label, "Unknown")
 
-        # plot_images(image_array)
-
-        image_flat = image_array.reshape(1, -1)  
-
-        image_standardized = image_flat / 255.0 
-
-        image_pca = loaded_pca.transform(image_standardized)
-
-        predicted_label = loaded_knn.predict(image_pca)
-        print(f"Predicted Label for New Image: {predicted_label[0]}")
-
-        # image_reconstructed = loaded_pca.inverse_transform(image_pca)
-
-        print(image_pca)
-        # plot_images(image_reconstructed)
-
-        return Response({"message": f"{predicted_label[0]}"}, status=status.HTTP_200_OK)
+        return Response({"message": f"{predicted_character}"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 @api_view(['POST'])
-def cnn_digits(request):
+def cnn_letters(request):
     try:
         base64_image = request.data.get('image')
+        if not base64_image:
+            return Response({"error": "No image data provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-        image_data = base64.b64decode(base64_image)  # Remove the data URL part
+        image_data = base64.b64decode(base64_image)
         image = Image.open(BytesIO(image_data))
 
-        loaded_model = tf.keras.models.load_model('mnist_cnn_model.keras')
+        loaded_model = tf.keras.models.load_model('emnist_cnn_model.keras')
 
-        # Resize the image to 28x28 pixels (grayscale)
-        image = image.convert('L')  # Convert to grayscale
+        image = image.convert('L') # togrey
         image = image.resize((28, 28))
         image_array = np.array(image)
 
-        predicted_label = np.argmax(loaded_model.predict(image_array.reshape(1, 28, 28, 1)))
+        prediction = loaded_model.predict(image_array.reshape(1, 28, 28, 1))
+        predicted_label = np.argmax(prediction)
+        predicted_character = EMNIST_LABELS.get(predicted_label, "Unknown")
 
-        return Response({"message": f"{predicted_label}"}, status=status.HTTP_200_OK)
+        return Response({"message": f"{predicted_character}"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 @api_view(['POST'])
-def cnn_pca_digits(request):
+def cnn_pca_letters(request):
     try:
+        if principal_components is None or loaded_cnn_pca_model is None:
+            return Response({"error": "Models not loaded properly"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         base64_image = request.data.get('image')
+        if not base64_image:
+            return Response({"error": "No image data provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-        image_data = base64.b64decode(base64_image)  # Remove the data URL part
+        image_data = base64.b64decode(base64_image)
         image = Image.open(BytesIO(image_data))
 
-        loaded_model = tf.keras.models.load_model('mnist_cnn_pca_model.keras')
-
-        # Resize the image to 28x28 pixels (grayscale)
-        image = image.convert('L')  # Convert to grayscale
+        image = image.convert('L')
         image = image.resize((28, 28))
-
 
         image_array = np.array(image)
 
-        def plot_images(original):
-            plt.figure(figsize=(10, 4))
-            # Original
-            plt.imshow(original.reshape(28, 28), cmap='gray')
-            plt.title("CNN with pca")
-            plt.axis('off')
+        image_flat = image_array.reshape(-1, 784)
 
-            plt.tight_layout()
-            plt.show()
+        Z = (image_flat - X_mean) / X_std
 
+        image_reduced = np.dot(Z, principal_components)
 
-        image_array = image_array.reshape(-1, 784)
+        image_reduced_reshaped = image_reduced.reshape(1, 10, 10, 1)
 
-        loaded = np.load("arrays.npz")
-        Z = (image_array - loaded['X_mean']) / loaded['X_std']
-        image_reduced = np.real(np.dot(Z, loaded['principal_components']))
+        prediction = loaded_cnn_pca_model.predict(image_reduced_reshaped)
+        predicted_label = np.argmax(prediction, axis=1)[0]
+        predicted_character = EMNIST_LABELS.get(predicted_label, "Unknown")
 
-        def reconstruct(X, principal_components):
-          X_reconstructed = 0
-          for i in range(principal_components.shape[1]):
-            X_reconstructed += X[:, i].reshape(-1, 1).dot(principal_components[:, i].reshape(-1, 1).T)
+        return Response({"message": f"{predicted_character}"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-          return X_reconstructed
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+def predict(request):
+    try:
+        image_data = request.data.get('image')
+        if not image_data:
+            return Response({'error': 'No image data provided'}, status=400)
+            
         
-        image_reconstructed = reconstruct(image_reduced, loaded['principal_components'])
-        print(image_reconstructed.shape)
-        #plot_images(image_reconstructed)
-
-        predicted_label = np.argmax(loaded_model.predict(image_reconstructed.reshape(1, 28, 28, 1)))
-
-        return Response({"message": f"{predicted_label}"}, status=status.HTTP_200_OK)
+        return Response({'result': 'success'})
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str(e)}, status=500)

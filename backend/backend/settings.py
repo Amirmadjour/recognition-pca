@@ -25,13 +25,41 @@ SECRET_KEY = 'django-insecure-j5*y-^*p##^&($4pqo@o5r2r*h3)umy#3+p+k^ul%usha04@!0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '192.168.1.37', 'handwrittendigits.madjria.com']
+ALLOWED_HOSTS = ['localhost', '192.168.1.33', 'handwrittendigits.madjria.com']
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8000',  # Expo URL for local development
-    'http://192.168.1.37:8000',  # Your Expo app IP address
-    'https://handwrittendigits.madjria.com'
+    'http://localhost:8000',
+    'http://localhost:19000',
+    'http://localhost:19006',
+    'http://192.168.1.33:8000',
+    'http://192.168.1.33:19000',
+    'http://192.168.1.33:19006',
+    'https://192.168.1.33:8000',
+    'https://192.168.1.33:19000',
+    'https://192.168.1.33:19006',
 ]
-# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -48,6 +76,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,7 +84,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
