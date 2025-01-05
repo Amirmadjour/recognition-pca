@@ -69,15 +69,14 @@ npx react-native build-android --mode=release
 - Django REST Framework
 - TensorFlow
 - NumPy
-- Pillow
 - scikit-learn
 
 ### Frontend
 - React Native
 - Expo
 - TypeScript
-- Lottie for animations
+- Lottie for animations (makanch animations)
 
 ## License
 
-[Your license here]
+makanch crédit, kayen ghir la lettre "Q" li rahi temchi rabani
