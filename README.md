@@ -78,6 +78,6 @@ npx react-native build-android --mode=release
 - TypeScript
 - Lottie for animations
 
-## License
+## Credits
 
-[Your license here]
+makanch crédit, kayen ghir la lettre "Q" li rahi temchi rabani
